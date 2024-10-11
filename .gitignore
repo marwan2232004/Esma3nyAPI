@@ -9,6 +9,7 @@ test_main.http
 # C extensions
 *.so
 *.pth
+*.zip
 # Distribution / packaging
 .Python
 build/

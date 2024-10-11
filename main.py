@@ -6,8 +6,7 @@ from fastapi import (
     File,
     UploadFile,
 )
-from openai import OpenAI
-import dotenv
+
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -15,11 +14,9 @@ from Inference import predict
 
 import tempfile
 import os
-from utils.Translation import get_translate
+from utils.Translation import *
 
-dotenv.load_dotenv()
 app = FastAPI()
-client = OpenAI()
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
@@ -38,35 +35,22 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.post("/translate-any")
-async def translate(txt: str, language: str):
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": f"Translate this {txt} into {language} directly without any other words",
-            }
-        ],
-    )
-    print(completion.choices[0].message.content)
-    return {"response": completion.choices[0].message.content}
-
-
 class TranslationRequest(BaseModel):
     text: str
 
 
 @app.post("/translate/auto")
 async def translate(request: TranslationRequest):
-    response = get_translate(request.text)
+    response = translate_openl(request.text)
     return {"translation": response}
 
 
 @app.post("/translate/en")
 async def translate(request: TranslationRequest):
-    # response = get_translate(request.text)
-    return {"translation": "ليس بعد"}
+    print(request.text)
+    response = translate(request.text)
+    print(response)
+    return {"translation": response}
 
 
 @app.post("/audio2text")
@@ -80,7 +64,7 @@ async def upload_audio(file: UploadFile = File(...)):
 
     # Create a temporary file in the current working directory
     with tempfile.NamedTemporaryFile(
-            dir=current_dir, delete=False, suffix=".wav"
+        dir=current_dir, delete=False, suffix=".wav"
     ) as tmp_file:
         tmp_file.write(contents)
         tmp_file_path = tmp_file.name  # Get the path of the temp file
