@@ -26,6 +26,7 @@ def download_file_from_google_drive(file_id, output_path):
 
 
 download_file_from_google_drive('1wYF0uHMHWdWb6G2XOB6dLQj3LWyz8u5X', './ASR_2_1_300.pth')
+download_file_from_google_drive('19hitohi6MgNPpTvsTqvt9fmQLWPxD9ky', './translate_v1.pth')
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
@@ -56,7 +57,7 @@ async def translateOpenL(request: TranslationRequest):
 
 @app.post("/translate/en")
 async def translate_endpoint(request: TranslationRequest):
-    response = await translate(request.text)
+    response = translate(request.text)
     return {"translation": response}
 
 
