@@ -18,6 +18,7 @@ from utils.Translation import *
 
 app = FastAPI()
 
+
 # Function to get the model and tokenizer from Google Drive instead of putting it in the repo
 def download_file_from_google_drive(file_id, output_path):
     url = f'https://drive.google.com/uc?id={file_id}'
