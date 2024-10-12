@@ -1,32 +1,20 @@
 import requests
-import sys
-import io
-import os
 import re
-import numpy as np
-
-from pathlib import Path
 
 import pandas as pd
 import torch
 
-# import evaluate
-
 from torch import nn
-from torch.utils.data import DataLoader, Dataset, Subset
-
-from tqdm.notebook import tqdm
+from torch.utils.data import Dataset
 
 from tokenizers import Tokenizer
 from tokenizers import normalizers
 from tokenizers import pre_tokenizers
-from tokenizers.models import WordLevel, WordPiece
+from tokenizers.models import WordLevel
 from tokenizers.processors import TemplateProcessing
 from tokenizers.normalizers import NFC, StripAccents, Strip, Lowercase
 from tokenizers.pre_tokenizers import Whitespace
-from tokenizers.trainers import WordLevelTrainer, WordPieceTrainer
-
-from sklearn.model_selection import train_test_split
+from tokenizers.trainers import WordLevelTrainer
 
 
 def translate_openl(txt):
@@ -204,13 +192,13 @@ class EncoderLayer(nn.Module):
 
 class Encoder(nn.Module):
     def __init__(
-        self,
-        vocab_size: int,
-        latent_dim: int,
-        n_layers: int,
-        n_heads: int,
-        pf_dim: int,
-        dropout: float,
+            self,
+            vocab_size: int,
+            latent_dim: int,
+            n_layers: int,
+            n_heads: int,
+            pf_dim: int,
+            dropout: float,
     ):
         super().__init__()
 
@@ -309,14 +297,14 @@ class DecoderLayer(nn.Module):
 
 class Decoder(nn.Module):
     def __init__(
-        self,
-        vocab_size: int,
-        latent_dim: int,
-        n_layers: int,
-        n_heads: int,
-        pf_dim: int,
-        dropout: float,
-        max_len: int = 100,
+            self,
+            vocab_size: int,
+            latent_dim: int,
+            n_layers: int,
+            n_heads: int,
+            pf_dim: int,
+            dropout: float,
+            max_len: int = 100,
     ):
         super().__init__()
         self.latent_dim = latent_dim
@@ -373,9 +361,9 @@ class Decoder(nn.Module):
 
 class Seq2Seq(nn.Module):
     def __init__(
-        self,
-        encoder: nn.Module,
-        decoder: nn.Module,
+            self,
+            encoder: nn.Module,
+            decoder: nn.Module,
     ):
         super().__init__()
         self.encoder = encoder
@@ -416,14 +404,13 @@ class Seq2Seq(nn.Module):
 
 
 def translate_sentence(
-    sentence: str,
-    src_tokenizer: Tokenizer,
-    trg_tokenizer: Tokenizer,
-    model: nn.Module,
-    device: torch.device,
-    max_len: int = 50,
+        sentence: str,
+        src_tokenizer: Tokenizer,
+        trg_tokenizer: Tokenizer,
+        model: nn.Module,
+        device: torch.device,
+        max_len: int = 50,
 ):
-
     model.eval()
 
     # encode sentence
@@ -544,6 +531,5 @@ def translate(sentence):
     )
     # print(translation)
     return translation
-
 
 # print(translate("سوف نذهب الي الحديقة الاحد المقبل"))

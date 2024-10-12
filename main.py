@@ -1,6 +1,7 @@
-import sys
 import io
+import sys
 
+import gdown
 from fastapi import (
     FastAPI,
     File,
@@ -11,12 +12,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from Inference import predict
-
 import tempfile
 import os
 from utils.Translation import *
 
 app = FastAPI()
+
+# Function to get the model and tokenizer from Google Drive instead of putting it in the repo
+def download_file_from_google_drive(file_id, output_path):
+    url = f'https://drive.google.com/uc?id={file_id}'
+    gdown.download(url, output_path, quiet=False)
+
+
+download_file_from_google_drive('1wYF0uHMHWdWb6G2XOB6dLQj3LWyz8u5X', './ASR_2_1_300.pth')
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 
@@ -40,16 +48,14 @@ class TranslationRequest(BaseModel):
 
 
 @app.post("/translate/auto")
-async def translate(request: TranslationRequest):
+async def translateOpenL(request: TranslationRequest):
     response = translate_openl(request.text)
     return {"translation": response}
 
 
 @app.post("/translate/en")
-async def translate(request: TranslationRequest):
-    print(request.text)
-    response = translate(request.text)
-    print(response)
+async def translate_endpoint(request: TranslationRequest):
+    response = await translate(request.text)
     return {"translation": response}
 
 
@@ -64,7 +70,7 @@ async def upload_audio(file: UploadFile = File(...)):
 
     # Create a temporary file in the current working directory
     with tempfile.NamedTemporaryFile(
-        dir=current_dir, delete=False, suffix=".wav"
+            dir=current_dir, delete=False, suffix=".wav"
     ) as tmp_file:
         tmp_file.write(contents)
         tmp_file_path = tmp_file.name  # Get the path of the temp file
