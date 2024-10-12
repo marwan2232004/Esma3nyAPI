@@ -47,7 +47,7 @@ def predict(audio_file):
         dim_feedforward=2048,
     )
 
-    model.load_state_dict(torch.load(model_path, weights_only=True))
+    model.load_state_dict(torch.load(model_path, weights_only=False))
     model.to(device)
     model.eval()
 
