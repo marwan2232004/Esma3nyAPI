@@ -21,7 +21,6 @@ def preprocess_vocab():
     idx2char = {idx: char for idx, char in enumerate(vocab)}
 
     vocab_size = len(vocab)
-    print(f"Vocabulary size: {vocab_size}")
     return char2idx, idx2char, vocab_size
 
 

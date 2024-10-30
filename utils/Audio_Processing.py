@@ -16,23 +16,17 @@ def pad_or_trim(array, length=N_SAMPLES, axis=-1, padding=True):
 
 
 # Function to load and preprocess audio
-def preprocess_audio(file_path):
-    audio_data, _ = librosa.load(file_path, sr=SAMPLE_RATE)
+def preprocess_audio(audio_data):
+    spectrogram = librosa.stft(y=audio_data, n_fft=N_FFT, hop_length=HOP_LENGTH)
 
-    duration = librosa.get_duration(y=audio_data, sr=SAMPLE_RATE)
+    spectrogram_mag, _ = librosa.magphase(spectrogram)
 
-    modified_audio = pad_or_trim(audio_data, padding=False)
-
-    sgram = librosa.stft(y=modified_audio, n_fft=N_FFT, hop_length=HOP_LENGTH)
-
-    sgram_mag, _ = librosa.magphase(sgram)
-
-    mel_scale_sgram = librosa.feature.melspectrogram(
-        S=sgram_mag, sr=SAMPLE_RATE, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS
+    mel_scale_spectrogram = librosa.feature.melspectrogram(
+        S=spectrogram_mag, sr=SAMPLE_RATE, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS
     )
 
-    mel_sgram = librosa.amplitude_to_db(mel_scale_sgram, ref=np.min)
+    mel_spectrogram = librosa.amplitude_to_db(mel_scale_spectrogram, ref=np.min)
 
-    del audio_data, modified_audio, sgram, mel_scale_sgram
+    del spectrogram, mel_scale_spectrogram, spectrogram_mag
 
-    return mel_sgram, duration
+    return mel_spectrogram
