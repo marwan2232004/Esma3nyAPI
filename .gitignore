@@ -6,6 +6,9 @@ __pycache__/
 ASR.pth
 Test Arabic.mp3
 test_main.http
+*.wav
+*.mp3
+res.txt
 # C extensions
 *.so
 *.pth

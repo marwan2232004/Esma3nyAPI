@@ -1,11 +1,9 @@
-import torch
+import whisper
+import sys
+import io
 
+model = whisper.load_model("turbo")
+result = model.transcribe("test6.mp3", language="ar")
 
-def get_device():
-
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    print(f"Using device: {device}")
-    return torch.device("cpu")
-
-
-get_device()
+with open("res.txt", "w", encoding="utf-8") as f:
+    f.write(result["text"])

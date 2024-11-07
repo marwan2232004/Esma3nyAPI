@@ -1,6 +1,9 @@
 import io
 import sys
 
+# import dotenv
+
+# dotenv.load_dotenv()
 import gdown
 from fastapi import (
     FastAPI,
@@ -105,3 +108,33 @@ async def upload_audio(file: UploadFile = File(...)):
         print(f"Temporary file deleted: {tmp_file_path}", flush=True)
 
     return {"text": result}
+
+
+# @app.post("/asr_openai")
+# async def asr_openai(file: UploadFile = File(...)):
+#     import whisper
+
+#     # Read the uploaded audio file into memory
+#     contents = await file.read()
+
+#     # Get the current working directory
+#     current_dir = os.getcwd()
+#     print(current_dir, flush=True)
+
+#     # Create a temporary file in the current working directory
+#     with tempfile.NamedTemporaryFile(
+#         dir=current_dir, delete=False, suffix=".wav"
+#     ) as tmp_file:
+#         tmp_file.write(contents)
+#         tmp_file_path = tmp_file.name  # Get the path of the temp file
+
+#     try:
+#         # Pass the path of the saved file to the predict function
+#         print(f"Temporary file created at: {tmp_file_path}", flush=True)
+#         model = whisper.load_model("base")
+#         result = model.transcribe("audio.wav")
+#     finally:
+#         # Clean up the temporary file after prediction
+#         os.remove(tmp_file_path)
+#         print(f"Temporary file deleted: {tmp_file_path}", flush=True)
+#     return {"text": result}
