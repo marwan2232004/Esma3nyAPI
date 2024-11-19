@@ -2,6 +2,8 @@
 
 Welcome to the ASR and Translation API! This project focuses on converting spoken Egyptian Arabic into written text and translating English text into Arabic. The architecture is inspired by OpenAI's Whisper model and utilizes a custom Transformer-based implementation.
 
+Frontend repository: [Esma3ny Frontend Repository](https://github.com/marwan2232004/Esma3ny)
+
 ## 🚀 Features
 
 - **Automatic Speech Recognition (ASR)**: Converts spoken Egyptian Arabic into written text.
