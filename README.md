@@ -45,4 +45,11 @@ Frontend repository: [Esma3ny Frontend Repository](https://github.com/marwan2232
 - **POST /translate/auto**: Translates from any language to Arabic.
   - **Request**: JSON with text
   - **Response**: JSON with translated Arabic text
+ 
+## ASR Transformer Architecture
+
+
+
+![Transformer_Architecture_complete drawio (1)](https://github.com/user-attachments/assets/139ad3f1-9ba0-491d-8dba-b749e8fc4e32)
+
 
