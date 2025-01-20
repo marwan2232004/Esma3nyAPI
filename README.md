@@ -4,6 +4,8 @@ Welcome to the ASR and Translation API! This project focuses on converting spoke
 
 Frontend repository: [Esma3ny Frontend Repository](https://github.com/marwan2232004/Esma3ny)
 
+Kaggle notebook: [Esma3ny Kaggle Notebook](https://www.kaggle.com/code/marwan2232004/speech2text-transformer)
+
 ## 🚀 Features
 
 - **Automatic Speech Recognition (ASR)**: Converts spoken Egyptian Arabic into written text.
