@@ -1,25 +1,22 @@
 import io
 import sys
-
-# import dotenv
-
-# dotenv.load_dotenv()
+import dotenv
 import gdown
 from fastapi import (
     FastAPI,
     File,
     UploadFile,
 )
-
+from typing import Callable
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
-from Inference import predict
+from Inference import predict, predict_whisper
 import tempfile
 import os
 from utils.Translation import *
-
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 app = FastAPI()
+dotenv.load_dotenv()
 
 
 # Function to get the model and tokenizer from Google Drive instead of putting it in the repo
@@ -28,14 +25,40 @@ def download_file_from_google_drive(file_id, output_path):
     gdown.download(url, output_path, quiet=False)
 
 
+# Helper function to handle file upload and prediction
+async def handle_audio_upload(file: UploadFile, predict_function: Callable):
+    # Read the uploaded audio file into memory
+    contents = await file.read()
+
+    # Get the current working directory
+    current_dir = os.getcwd()
+    print(f"Current directory: {current_dir}", flush=True)
+
+    # Create a temporary file in the current working directory
+    with tempfile.NamedTemporaryFile(
+            dir=current_dir, delete=False, suffix=".wav"
+    ) as tmp_file:
+        tmp_file.write(contents)
+        tmp_file_path = tmp_file.name  # Get the path of the temp file
+
+    try:
+        # Pass the path of the saved file to the predict function
+        print(f"Temporary file created at: {tmp_file_path}", flush=True)
+        result = predict_function(tmp_file_path)
+    finally:
+        # Clean up the temporary file after prediction
+        os.remove(tmp_file_path)
+        print(f"Temporary file deleted: {tmp_file_path}", flush=True)
+
+    return result
+
+
 # download_file_from_google_drive(
 #     "1wYF0uHMHWdWb6G2XOB6dLQj3LWyz8u5X", "./ASR_2_1_300.pth"
 # )
 # download_file_from_google_drive(
 #     "19hitohi6MgNPpTvsTqvt9fmQLWPxD9ky", "./translate_v1.pth"
 # )
-
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-ar")
 model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-ar")
@@ -82,59 +105,15 @@ async def translate_endpoint(request: TranslationRequest):
     return {"translation": response}
 
 
+# Endpoint for generic audio-to-text conversion
 @app.post("/audio2text")
 async def upload_audio(file: UploadFile = File(...)):
-    # Read the uploaded audio file into memory
-    contents = await file.read()
-
-    # Get the current working directory
-    current_dir = os.getcwd()
-    print(current_dir, flush=True)
-
-    # Create a temporary file in the current working directory
-    with tempfile.NamedTemporaryFile(
-        dir=current_dir, delete=False, suffix=".wav"
-    ) as tmp_file:
-        tmp_file.write(contents)
-        tmp_file_path = tmp_file.name  # Get the path of the temp file
-
-    try:
-        # Pass the path of the saved file to the predict function
-        print(f"Temporary file created at: {tmp_file_path}", flush=True)
-        result = predict(tmp_file_path)
-    finally:
-        # Clean up the temporary file after prediction
-        os.remove(tmp_file_path)
-        print(f"Temporary file deleted: {tmp_file_path}", flush=True)
-
+    result = await handle_audio_upload(file, predict)
     return {"text": result}
 
 
-# @app.post("/asr_openai")
-# async def asr_openai(file: UploadFile = File(...)):
-#     import whisper
-
-#     # Read the uploaded audio file into memory
-#     contents = await file.read()
-
-#     # Get the current working directory
-#     current_dir = os.getcwd()
-#     print(current_dir, flush=True)
-
-#     # Create a temporary file in the current working directory
-#     with tempfile.NamedTemporaryFile(
-#         dir=current_dir, delete=False, suffix=".wav"
-#     ) as tmp_file:
-#         tmp_file.write(contents)
-#         tmp_file_path = tmp_file.name  # Get the path of the temp file
-
-#     try:
-#         # Pass the path of the saved file to the predict function
-#         print(f"Temporary file created at: {tmp_file_path}", flush=True)
-#         model = whisper.load_model("base")
-#         result = model.transcribe("audio.wav")
-#     finally:
-#         # Clean up the temporary file after prediction
-#         os.remove(tmp_file_path)
-#         print(f"Temporary file deleted: {tmp_file_path}", flush=True)
-#     return {"text": result}
+# Endpoint for Whisper ASR
+@app.post("/whisper-asr")
+async def whisper_asr(file: UploadFile = File(...)):
+    result = await handle_audio_upload(file, predict_whisper)
+    return {"text": result}

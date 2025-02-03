@@ -11,3 +11,5 @@ tokenizers~=0.20.1
 pandas~=2.2.3
 transformers==4.46.1
 sentencepiece==0.2.0
+python-dotenv~=1.0.1
+peft~=0.14.0
